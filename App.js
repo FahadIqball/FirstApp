@@ -15,6 +15,8 @@ import {logout} from './src/services/firebaseService';
 import messaging from '@react-native-firebase/messaging';
 import {PushNotification} from 'react-native-push-notification';
 import {PermissionsAndroid} from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleTheme } from './src/store/theme';
 
 const PROF = [
   {
@@ -73,6 +75,8 @@ const App = ({navigation}) => {
     setModal1Visible(!modal1Visible);
     
   };
+  const dispatch = useDispatch();
+  const handletheme = () => {dispatch(toggleTheme())}
   const renderstory_ = ({item, index}) => {
     return (
       <View
@@ -325,9 +329,11 @@ const App = ({navigation}) => {
               source={require('./src/assets/icons/like.png')}
               style={{width: 30, height: 30, margin: 5}}></Image>
           </TouchableOpacity>
-          <Image
-            source={require('./src/assets/icons/cmnt.png')}
-            style={{width: 30, height: 30, margin: 5}}></Image>
+          <TouchableOpacity
+            style={{width: 30, height: 30, margin: 5}}
+            onPress={handletheme}>
+            <Icon name={'dots-three-vertical'} size={25} color={'black'} />
+          </TouchableOpacity>
           <Image
             source={require('./src/assets/icons/send.png')}
             style={{width: 30, height: 30, margin: 5}}></Image>
