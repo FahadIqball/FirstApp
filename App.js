@@ -15,8 +15,8 @@ import {logout} from './src/services/firebaseService';
 import messaging from '@react-native-firebase/messaging';
 import {PushNotification} from 'react-native-push-notification';
 import {PermissionsAndroid} from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { toggleTheme } from './src/store/theme';
+import {useDispatch, useSelector} from 'react-redux';
+import {toggleTheme} from './src/store/theme';
 
 const PROF = [
   {
@@ -69,14 +69,15 @@ const App = ({navigation}) => {
   const [name, setName] = useState('');
   const [isLoading, setisLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-
+  const imageUrl = useSelector(state => state.image.imageUrl);
   const [modal1Visible, setModal1Visible] = useState(false);
   const toggleModal1 = () => {
     setModal1Visible(!modal1Visible);
-    
   };
   const dispatch = useDispatch();
-  const handletheme = () => {dispatch(toggleTheme())}
+  const handletheme = () => {
+    dispatch(toggleTheme());
+  };
   const renderstory_ = ({item, index}) => {
     return (
       <View
@@ -337,8 +338,7 @@ const App = ({navigation}) => {
           <Image
             source={require('./src/assets/icons/send.png')}
             style={{width: 30, height: 30, margin: 5}}></Image>
-          <TouchableOpacity
-            onPress={toggleModal1}>
+          <TouchableOpacity onPress={toggleModal1}>
             <Image
               source={require('./src/assets/icons/save.png')}
               style={{
@@ -480,10 +480,25 @@ const App = ({navigation}) => {
                         width: 80,
                         height: 80,
                         borderRadius: 50,
-                        borderWidth: 3,
                         borderColor: 'grey',
                         backgroundColor: '#000',
-                      }}></View>
+                      }}>
+                      <Image
+                        source={
+                          imageUrl
+                            ? {uri: imageUrl}
+                            : require('./src/assets/images/user.png')
+                        }
+                        style={{
+                          borderWidth: 2,
+                          borderColor: 'grey',
+                          width: 80,
+                          height: 80,
+                          borderRadius: 50,
+                        }}
+                        resizeMode="cover"
+                      />
+                    </View>
 
                     <Text
                       style={{
