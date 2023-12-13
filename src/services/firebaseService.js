@@ -1,80 +1,99 @@
-import auth from "@react-native-firebase/auth";
-import { Alert } from "react-native"
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import auth from '@react-native-firebase/auth';
+import {Alert} from 'react-native';
+import {
+  GoogleSignin,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+import firestore from '@react-native-firebase/firestore';
 
 const registerUserWithEmail = (email, pass) => {
-    auth()
-        .createUserWithEmailAndPassword(email, pass)
-        .then((user) => {
-            Alert.alert('Success', JSON.stringify(user))
-
-        })
-        .catch((error) => {
-            Alert.alert('Failed', JSON.stringify(error.message))
-        })
-}
+  auth()
+    .createUserWithEmailAndPassword(email, pass)
+    .then(user => {
+      Alert.alert('Success', JSON.stringify(user));
+    })
+    .catch(error => {
+      Alert.alert('Failed', JSON.stringify(error.message));
+    });
+};
 
 const loginWithEmail = (email, pass) => {
-    auth()
-        .signInWithEmailAndPassword(email, pass)
-        .then((user) => {
-            Alert.alert('Success', JSON.stringify(user))
+  auth()
+    .signInWithEmailAndPassword(email, pass)
+    .then(user => {
+      Alert.alert('Success', JSON.stringify(user));
+    })
+    .catch(error => {
+      Alert.alert('Failed', JSON.stringify(error.message));
+    });
+};
 
-        })
-        .catch((error) => {
-            Alert.alert('Failed', JSON.stringify(error.message))
-        })
-}
-
-const resetPassword = (email) => {
-    auth()
+const resetPassword = email => {
+  auth()
     .sendPasswordResetEmail(email)
-    .then((data) => {
-        Alert.alert('Success', JSON.stringify(data))
-
+    .then(data => {
+      Alert.alert('Success', JSON.stringify(data));
     })
-    .catch((error) => {
-        Alert.alert('Failed', JSON.stringify(error.message))
-    })
-}
+    .catch(error => {
+      Alert.alert('Failed', JSON.stringify(error.message));
+    });
+};
 
 const logout = () => {
-    auth()
-        .signOut()
-        .then(() => {
+  auth()
+    .signOut()
+    .then(() => {})
+    .catch(() => {});
+};
 
-        })
-        .catch(() => {
+const signInWithGoogle = async (callback = () => {}) => {
+  try {
+    await GoogleSignin.hasPlayServices();
 
-        })
-}
-  
-    const signInWithGoogle = async () => {
-      try {
-        await GoogleSignin.hasPlayServices();
-        const isSignediN = await GoogleSignin.isSignedIn()
-        if (isSignediN) {
-            await GoogleSignin.revokeAccess();
-      }
-        const { idToken } = await GoogleSignin.signIn();
-        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-        await auth().signInWithCredential(googleCredential);
-        console.log('User signed in with Google and Firebase');
-      } catch (error) {
-        if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        } else if (error.code === statusCodes.IN_PROGRESS) {
-        } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        } else {
-          console.error(error);
-        }
-      }
+    const isSignediN = await GoogleSignin.isSignedIn();
+    if (isSignediN) {
+      await GoogleSignin.revokeAccess();
     }
+    const {idToken, user} = await GoogleSignin.signIn();
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
 
+    const fullName = user.name;
+    const Email = user.email;
+    auth()
+      .signInWithCredential(googleCredential)
+      .then(async user => {
+        if (user.user.uid) {
+          const exists = await firestore()
+            .collection('users')
+            .doc(user.user.uid)
+            .get();
+          if (exists.exists) {
+          } else {
+            storeUserDataToDatabase(fullName, Email, user.user.uid);
+            callback({
+              fullName,
+              Email,
+              userId: user.user.uid,
+            });
+          }
+        }
+      });
+  } catch (error) {
+    Alert.alert('Failed', JSON.stringify(error.message));
+  }
+};
 
+const storeUserDataToDatabase = async (fullName, Email, userId) => {
+  await firestore().collection('users').doc(userId).set({
+    fullName,
+    Email,
+    userId,
+  });
+};
 export {
-    registerUserWithEmail,
-    logout,
-    loginWithEmail,
-    resetPassword,
-    signInWithGoogle,
-} 
+  registerUserWithEmail,
+  logout,
+  loginWithEmail,
+  resetPassword,
+  signInWithGoogle,
+};

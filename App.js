@@ -17,6 +17,9 @@ import {PushNotification} from 'react-native-push-notification';
 import {PermissionsAndroid} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {toggleTheme} from './src/store/theme';
+import { setUserData } from './src/store/userDataAction';
+import auth from '@react-native-firebase/auth'
+import firestore from '@react-native-firebase/firestore'
 
 const PROF = [
   {
@@ -71,6 +74,7 @@ const App = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const imageUrl = useSelector(state => state.image.imageUrl);
   const [modal1Visible, setModal1Visible] = useState(false);
+  const userData = useSelector(state => state.user.fullName);
   const toggleModal1 = () => {
     setModal1Visible(!modal1Visible);
   };
@@ -176,6 +180,29 @@ const App = ({navigation}) => {
       console.log('Error', error);
     }
   };
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userId = auth().currentUser.uid;
+
+        if (userId) {
+          const userDocument = await firestore().collection('users').doc(userId).get();
+
+          if (userDocument.exists) {
+            dispatch(setUserData({...userDocument.data(), documentId: userDocument.id}));
+          } else {
+          }
+        } else {
+          console.warn('No user identifier found');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   React.useEffect(() => {
     requestUserPermission();
@@ -485,8 +512,8 @@ const App = ({navigation}) => {
                       }}>
                       <Image
                         source={
-                          imageUrl
-                            ? {uri: imageUrl}
+                          userData.url
+                            ? {uri: userData.url}
                             : require('./src/assets/images/user.png')
                         }
                         style={{
