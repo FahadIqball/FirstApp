@@ -13,6 +13,7 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {LogLevel, OneSignal} from 'react-native-onesignal';
 import { Provider } from 'react-redux';
 import store from './src/store';
+import TestApi from './src/navigation/testApi';
 
 const Stack = createNativeStackNavigator();
 const Main = () => {
@@ -68,6 +69,7 @@ const Main = () => {
           </>
         ) : (
           <>
+            {/* <Stack.Screen name='Api' component={TestApi}/> */}
             <Stack.Screen name="Onboarding" component={Onboarding} />
             <Stack.Screen name="Auth" component={Auth} />
           </>

@@ -2,8 +2,11 @@ import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {signInWithGoogle} from '../services/firebaseService';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../store/userDataAction';
 
 const Onboarding = ({navigation}) => {
+  const dispatch = useDispatch();
   return (
     <View style={{flex: 1, backgroundColor: '#EC8B5E'}}>
       <View
@@ -50,7 +53,7 @@ const Onboarding = ({navigation}) => {
             Continue with
           </Text>
           <TouchableOpacity
-            onPress={signInWithGoogle}
+            onPress={() => signInWithGoogle((data) => dispatch(setUserData(data)))}
             style={{
               borderRadius: 35,
               borderColor: '#141A46',
