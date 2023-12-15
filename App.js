@@ -82,6 +82,8 @@ const App = ({navigation}) => {
   const handletheme = () => {
     dispatch(toggleTheme());
   };
+
+  //COMPLETED FOR NOW, WORKING
   const renderstory_ = ({item, index}) => {
     return (
       <View
